@@ -7,18 +7,10 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.licenses    = ['MIT']
   s.summary     = 'Barebones two-factor authentication with Devise'
-  s.email       = 'engineers@tinfoilsecurity.com'
-  s.homepage    = 'https://github.com/tinfoil/devise-two-factor'
-  s.description = 'Barebones two-factor authentication with Devise'
-  s.authors     = ['Shane Wilton']
-
-  s.cert_chain  = [
-                    'certs/tinfoil-cacert.pem',
-                    'certs/tinfoilsecurity-gems-cert.pem'
-                  ]
-  s.signing_key = File.expand_path("~/.ssh/tinfoilsecurity-gems-key.pem") if $0 =~ /gem\z/
-
-  s.rubyforge_project = 'devise-two-factor'
+  s.email       = 'engineering@qulture.rocks'
+  s.homepage    = 'https://github.com/QultureRocks/devise-two-factor'
+  s.description = 'Fork of tinfoilsecurity devise-two-factor'
+  s.authors     = ['Shane Wilton', 'Joao Marinho']
 
   s.files         = `git ls-files`.split("\n").delete_if { |x| x.match('demo/*') }
   s.test_files    = `git ls-files -- spec/*`.split("\n")
