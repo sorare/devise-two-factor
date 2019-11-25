@@ -1,3 +1,8 @@
+# Qulture Fork
+This is a fork of https://github.com/tinfoil/devise-two-factor
+
+The original gem had a dependency on rotp ~> 2.0. This fork makes it compatible with rotp >= 5.
+
 # Devise-Two-Factor Authentication
 By [Tinfoil Security](https://www.tinfoilsecurity.com/). Interested in [working with us](https://www.tinfoilsecurity.com/jobs)? We're hiring!
 
