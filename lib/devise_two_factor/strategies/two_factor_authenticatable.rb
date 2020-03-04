@@ -1,28 +1,35 @@
+# frozen_string_literal: true
+
 module Devise
   module Strategies
-    class TwoFactorAuthenticatable < Devise::Strategies::DatabaseAuthenticatable
-
+    class TwoFactorAuthenticatable < Devise::Strategies::Authenticatable
       def authenticate!
-        resource = mapping.to.find_for_database_authentication(authentication_hash)
-        # We authenticate in two cases:
-        # 1. The password and the OTP are correct
-        # 2. The password is correct, and OTP is not required for login
-        # We check the OTP, then defer to DatabaseAuthenticatable
-        if validate(resource) { validate_otp(resource) }
-          super
+        resource = password.present? && mapping.to.find_for_database_authentication(authentication_hash)
+        hashed = false
+
+        if validate(resource) { hashed = true; resource.valid_password?(password) }
+          if validate_otp!(resource)
+            remember_me(resource)
+            resource.after_database_authentication
+            success!(resource)
+          end
         end
 
-        fail(Devise.paranoid ? :invalid : :not_found_in_database) unless resource
-
-        # We want to cascade to the next strategy if this one fails,
-        # but database authenticatable automatically halts on a bad password
-        @halted = false if @result == :failure
+        # In paranoid mode, hash the password even when a resource doesn't exist for the given authentication key.
+        # This is necessary to prevent enumeration attacks - e.g. the request is faster when a resource doesn't
+        # exist in the database if the password hashing algorithm is not called.
+        mapping.to.new.password = password if !hashed && Devise.paranoid
+        unless resource
+          Devise.paranoid ? fail(:invalid) : fail(:not_found_in_database)
+        end
       end
 
-      def validate_otp(resource)
+      def validate_otp!(resource)
         return true unless resource.otp_required_for_login
-        return if params[scope]['otp_attempt'].nil?
-        resource.validate_and_consume_otp!(params[scope]['otp_attempt'])
+        return true if resource.validate_and_consume_otp!(params[scope]['otp_attempt'])
+
+        fail!(:'2fa_missing')
+        return false
       end
     end
   end
